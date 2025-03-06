@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Financial Explanation Generator</title>
+	<link rel="stylesheet" href="/static/styles.css">
+</head>
+
+<body>
+	<div class="header">
+		<img src="/static/nie.png" alt="NIE">
+		<img src="/static/ivis.png" alt="IVIS" style="width: 200px;">
+		<img src="/static/pulse.png" alt="Pulse">
+	</div>
+	<div class="container">
+		<h2>Financial Explanation Generator</h2>
+		<form id="explanationForm">
+			<label for="topic">Enter a Finance Concept:</label>
+			<input type="text" id="topic" name="topic" required>
+
+			<label for="num_explanations">Number of Explanations:</label>
+			<select id="num_explanations" name="num_explanations">
+				<option value="1">1</option>
+				<option value="3" selected>3</option>
+				<option value="5">5</option>
+			</select>
+
+			<label for="tone">Select Tone:</label>
+			<select id="tone" name="tone">
+				<option value="professional" selected>Professional</option>
+				<option value="friendly">Friendly</option>
+				<option value="casual">Casual</option>
+			</select>
+
+			<label for="include_examples">
+				<input type="checkbox" id="include_examples" name="include_examples" checked style="width: auto;">
+				Include real-world examples
+			</label>
+
+			<button type="submit">Generate Explanation</button>
+		</form>
+
+		<div id="result"></div>
+	</div>
+	
+	<script>
+		document.getElementById("explanationForm").addEventListener("submit", async function (event) {
+			event.preventDefault();
+			const topic = document.getElementById("topic").value;
+			const num_explanations = document.getElementById("num_explanations").value;
+			const tone = document.getElementById("tone").value;
+			const include_examples = document.getElementById("include_examples").checked;
+
+			const formData = new FormData();
+			formData.append("niche", topic);
+			formData.append("num_ideas", num_explanations);
+			formData.append("tone", tone);
+			formData.append("include_outline", include_examples);
+
+			document.getElementById("result").innerHTML = "<center><div class='loader'></div>Generating explanation...</center>";
+
+			try {
+				const response = await fetch("/generate", {
+					method: "POST",
+					body: formData
+				});
+
+				const data = await response.json();
+				if (data.generated_ideas) {
+					document.getElementById("result").innerHTML = `<h2>Generated Explanation:</h2><p>${data.generated_ideas}</p>`;
+				} else {
+					document.getElementById("result").innerHTML = "<p>⚠️ Error: No explanation received. Please try again.</p>";
+				}
+
+			} catch (error) {
+				document.getElementById("result").innerHTML = "<p>Error generating explanation. Please try again.</p>";
+			}
+		});
+	</script>
+</body>
+
+</html>
