@@ -4,3 +4,4 @@ pydantic
 markdown
 uvicorn
 python-dotenv
+jinja2
